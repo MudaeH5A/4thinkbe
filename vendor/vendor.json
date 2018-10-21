@@ -33,6 +33,24 @@
 			"revisionTime": "2018-08-30T10:17:45Z"
 		},
 		{
+			"checksumSHA1": "4xiFcTuGN52sL6Cu9CLSIq48RT8=",
+			"path": "github.com/skip2/go-qrcode",
+			"revision": "cf5f9fa2f0d847edb8e038db7ed975e239095e1a",
+			"revisionTime": "2017-12-29T12:04:47Z"
+		},
+		{
+			"checksumSHA1": "xkuxp8PnGrQUsIXMiIOCk4U5IGw=",
+			"path": "github.com/skip2/go-qrcode/bitset",
+			"revision": "cf5f9fa2f0d847edb8e038db7ed975e239095e1a",
+			"revisionTime": "2017-12-29T12:04:47Z"
+		},
+		{
+			"checksumSHA1": "UtPg/z5chOpfiJvr29Or0oUx1Bs=",
+			"path": "github.com/skip2/go-qrcode/reedsolomon",
+			"revision": "cf5f9fa2f0d847edb8e038db7ed975e239095e1a",
+			"revisionTime": "2017-12-29T12:04:47Z"
+		},
+		{
 			"checksumSHA1": "LTOa3BADhwvT0wFCknPueQALm8I=",
 			"origin": "github.com/valyala/fasttemplate/vendor/github.com/valyala/bytebufferpool",
 			"path": "github.com/valyala/bytebufferpool",

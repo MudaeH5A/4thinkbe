@@ -8,7 +8,7 @@ import (
 
 type Profile struct {
 	ID             int       `bson:"_id" json:"-"`
-	Inventory      Room      `bson:"inventory" json:"inventario"`
+	Inventory      []Room    `bson:"inventory" json:"inventario"`
 	CurrentAddress Address   `bson:"current_address" json:"endereco_atual"`
 	NewAddress     Address   `bson:"new_address" json:"endereco_novo"`
 	MovingData     time.Time `bson:"moving_data" json:"data_mudanca"`

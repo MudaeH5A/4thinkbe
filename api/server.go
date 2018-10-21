@@ -2,10 +2,10 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/arxdsilva/4thinkbe/db"
@@ -136,9 +136,11 @@ func (s *Server) VehicleHandler(c echo.Context) (err error) {
 }
 
 func (s *Server) BoxCoder(c echo.Context) (err error) {
-	appURL := "https://mudae.herokuapp.com/"
-	path := trimSuffix(c.Path(), "/code")
-	png, err := qrcode.Encode(appURL+path, qrcode.Medium, 256)
+	userNumber := c.Param("userNumber")
+	room := c.Param("room")
+	boxNumber := c.Param("boxNumber")
+	appURL := fmt.Sprintf("https://mudae.herokuapp.com/%s/%s/%s", userNumber, room, boxNumber)
+	png, err := qrcode.Encode(appURL, qrcode.Medium, 256)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -150,11 +152,4 @@ func (s *Server) BoxCoder(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return
-}
-
-func trimSuffix(s, suffix string) string {
-	if strings.HasSuffix(s, suffix) {
-		s = s[:len(s)-len(suffix)]
-	}
-	return s
 }

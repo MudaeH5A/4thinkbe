@@ -7,12 +7,10 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-var DB *mgo.Database
-
-func Connection() {
+func Connection() *mgo.Database {
 	session, err := mgo.Dial(os.Getenv("MONGO_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	DB = session.DB(os.Getenv("MONGO_DB"))
+	return session.DB(os.Getenv("MONGO_DB"))
 }

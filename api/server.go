@@ -25,6 +25,7 @@ func (s *Server) Listen() {
 	e := echo.New()
 	e.Static("/static", "assets")
 	e.GET("/:userNumber", s.HomeHandler)
+	// e.POST("/:userNumber/:vehicle", s.VehicleHandler)
 	e.Logger.Fatal(e.Start(":" + port()))
 }
 
@@ -48,7 +49,7 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 	}
 	p, err := models.GetByID(s.Storage, number)
 	if (err != nil) && (err != mgo.ErrNotFound) {
-		return
+		return echo.NewHTTPError(500, err)
 	}
 	if err == mgo.ErrNotFound {
 		r := models.Room{Name: "Sala", Boxes: []models.Item{models.Item{Quantity: 2, Type: "moveis"}}}
@@ -58,7 +59,7 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 		p = models.Profile{ID: number, Inventory: r, NewAddress: na, CurrentAddress: ca, MovingData: time.Now(), MovingTime: time.Now(), Offer: offer}
 		errC := models.Create(s.Storage, p)
 		if errC != nil {
-			return errC
+			return echo.NewHTTPError(500, errC)
 		}
 	}
 	return c.JSON(http.StatusFound, p)

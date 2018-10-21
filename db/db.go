@@ -8,7 +8,7 @@ import (
 )
 
 func Connection() *mgo.Database {
-	session, err := mgo.Dial(os.Getenv("MONGO_URL"))
+	session, err := mgo.Dial(os.Getenv("MONGODB_URI"))
 	if err != nil {
 		log.Fatal(err)
 	}

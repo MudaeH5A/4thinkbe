@@ -60,7 +60,7 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 	}
 	if err == mgo.ErrNotFound {
 		r := models.Room{
-			Name: "Sala",
+			Name: "sala",
 			Boxes: []models.Box{
 				models.Box{
 					Items: []models.Item{

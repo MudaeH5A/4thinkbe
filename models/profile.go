@@ -34,9 +34,9 @@ type Address struct {
 }
 
 type Offer struct {
+	VehicleType int     `bson:"vehicle" json:"-"`
 	Distance    float64 `bson:"distance" json:"distancia"`
 	LabourValue float64 `bson:"labour_value" json:"mao_de_obra"`
-	KmValue     float64 `bson:"km_value" json:"valor_por_km"`
 	TotalValue  float64 `bson:"total_value" json:"total_value"`
 }
 

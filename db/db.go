@@ -12,5 +12,5 @@ func Connection() *mgo.Database {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return session.DB(os.Getenv("MONGO_DB"))
+	return session.DB("mudae")
 }

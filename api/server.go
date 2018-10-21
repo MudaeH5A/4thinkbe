@@ -5,11 +5,13 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/arxdsilva/4thinkbe/db"
 	"github.com/arxdsilva/4thinkbe/models"
 	"github.com/labstack/echo"
+	qrcode "github.com/skip2/go-qrcode"
 	"gopkg.in/mgo.v2"
 )
 
@@ -26,6 +28,8 @@ func (s *Server) Listen() {
 	e := echo.New()
 	e.Static("/static", "assets")
 	e.GET("/:userNumber", s.HomeHandler)
+	e.GET("/:userNumber/:room/:boxNumber/code", s.BoxCoder)
+	// e.GET("/:userNumber/:room/:boxNumber", s.BoxContent)
 	e.POST("/:userNumber/:vehicle", s.VehicleHandler)
 	e.Logger.Fatal(e.Start(":" + port()))
 }
@@ -129,4 +133,28 @@ func (s *Server) VehicleHandler(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return c.JSON(http.StatusCreated, p.Offer)
+}
+
+func (s *Server) BoxCoder(c echo.Context) (err error) {
+	appURL := "https://mudae.herokuapp.com/"
+	path := trimSuffix(c.Path(), "/code")
+	png, err := qrcode.Encode(appURL+path, qrcode.Medium, 256)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	resp := c.Response()
+	resp.Header().Set("Content-Type", "image/png")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(png)))
+	_, err = resp.Write(png)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	return
+}
+
+func trimSuffix(s, suffix string) string {
+	if strings.HasSuffix(s, suffix) {
+		s = s[:len(s)-len(suffix)]
+	}
+	return s
 }

@@ -18,7 +18,11 @@ type Profile struct {
 
 type Room struct {
 	Name  string `bson:"name" json:"nome"`
-	Boxes []Item `bson:"boxes" json:"caixas"`
+	Boxes []Box  `bson:"boxes" json:"caixas"`
+}
+
+type Box struct {
+	Items []Item `bson:"items" json:"items"`
 }
 
 type Item struct {

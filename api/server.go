@@ -188,7 +188,7 @@ func (s *Server) BoxContent(c echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
-	return c.JSON(http.StatusFound, p.Inventory[index].Boxes[boxInt])
+	return c.JSON(http.StatusFound, p.Inventory[index].Boxes[boxInt-1])
 }
 
 func findRoomAndIndex(name string, rooms []models.Room) (i int, err error) {

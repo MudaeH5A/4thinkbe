@@ -35,6 +35,11 @@ func port() (p string) {
 	return "8080"
 }
 
+// HomeHandler populates a new user if it does not exists
+// or just returns it if It is existant in the DB
+// HTTP responses:
+// 200 ok
+// 500 internal server error
 func (s *Server) HomeHandler(c echo.Context) (err error) {
 	userNumber := c.Param("userNumber")
 	number, err := strconv.Atoi(userNumber)

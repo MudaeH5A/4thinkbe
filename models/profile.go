@@ -35,6 +35,7 @@ type Address struct {
 
 type Offer struct {
 	VehicleType int     `bson:"vehicle" json:"-"`
+	KmValue     float64 `bson:"km_value" json:"valor_por_km"`
 	Distance    float64 `bson:"distance" json:"distancia"`
 	LabourValue float64 `bson:"labour_value" json:"mao_de_obra"`
 	TotalValue  float64 `bson:"total_value" json:"total_value"`
@@ -57,10 +58,16 @@ func (o *Offer) CalculateTotalValue() {
 	switch o.VehicleType {
 	case 1:
 		o.TotalValue = 250 + 2.0*o.Distance
+		o.LabourValue = 250
+		o.KmValue = 2.0
 	case 2:
 		o.TotalValue = 350 + 2.6*o.Distance
+		o.LabourValue = 350
+		o.KmValue = 2.6
 	case 3:
 		o.TotalValue = 500 + 3.0*o.Distance
+		o.LabourValue = 500
+		o.KmValue = 3.0
 	}
 }
 

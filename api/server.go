@@ -162,7 +162,7 @@ func (s *Server) BoxCoder(c echo.Context) (err error) {
 
 // BoxContent lists the contents of a specific
 // box after the QR code call to the API
-// GET /:userNumber/:room/:box
+// GET /:userNumber/:roomName/:boxNumber
 //
 // HTTP responses:
 // 302 OK

@@ -1,8 +1,13 @@
-package model
+package models
 
-import "time"
+import (
+	"time"
+
+	mgo "gopkg.in/mgo.v2"
+)
 
 type Profile struct {
+	ID             int       `bson:"_id" json:"-"`
 	Inventory      Room      `bson:"inventory" json:"inventario"`
 	CurrentAddress Address   `bson:"current_address" json:"endereco_atual"`
 	NewAddress     Address   `bson:"new_address" json:"endereco_novo"`
@@ -33,4 +38,17 @@ type Offer struct {
 	LabourValue float64 `bson:"labour_value" json:"mao_de_obra"`
 	KmValue     float64 `bson:"km_value" json:"valor_por_km"`
 	TotalValue  float64 `bson:"total_value" json:"total_value"`
+}
+
+func (p *Profile) CreateOrUpdate(db *mgo.Database) (err error) {
+	_, err = db.C("profiles").UpsertId(p.ID, p)
+	return
+}
+
+func (p *Profile) DeleteByID(db *mgo.Database) error {
+	return db.C("profiles").RemoveId(p.ID)
+}
+
+func GetByID(db *mgo.Database, id string) (p Profile, err error) {
+	return p, db.C("profiles").FindId(id).One(&p)
 }

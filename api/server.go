@@ -25,7 +25,7 @@ func (s *Server) Listen() {
 	e := echo.New()
 	e.Static("/static", "assets")
 	e.GET("/:userNumber", s.HomeHandler)
-	// e.POST("/:userNumber/:vehicle", s.VehicleHandler)
+	e.POST("/:userNumber/:vehicle", s.VehicleHandler)
 	e.Logger.Fatal(e.Start(":" + port()))
 }
 
@@ -63,4 +63,39 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 		}
 	}
 	return c.JSON(http.StatusFound, p)
+}
+
+// VehicleHandler handles the user offer infos
+// it helps adding data to the user
+// POST /:userNumber/:vehicleNumber [1-3]
+//
+// HTTP responses:
+// 201 created
+// 400 bad request
+// 500 internal server error
+func (s *Server) VehicleHandler(c echo.Context) (err error) {
+	userNumber := c.Param("userNumber")
+	number, err := strconv.Atoi(userNumber)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	vehicleNumber := c.Param("vehicle")
+	vehicle, err := strconv.Atoi(vehicleNumber)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	if (vehicle > 3) || (vehicle < 1) {
+		return echo.NewHTTPError(http.StatusBadRequest, errors.New("Vehicle type can only be between [1-3]"))
+	}
+	p, err := models.GetByID(s.Storage, number)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err)
+	}
+	p.Offer.VehicleType = vehicle
+	p.Offer.CalculateTotalValue()
+	err = p.CreateOrUpdate(s.Storage)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusCreated, p.Offer)
 }

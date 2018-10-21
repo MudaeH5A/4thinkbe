@@ -135,6 +135,12 @@ func (s *Server) VehicleHandler(c echo.Context) (err error) {
 	return c.JSON(http.StatusCreated, p.Offer)
 }
 
+// BoxCoder generates QR Codes for a specific box
+// GET /:userNumber/:room/:box/code
+//
+// HTTP responses:
+// 200 OK
+// 500 internal server error
 func (s *Server) BoxCoder(c echo.Context) (err error) {
 	userNumber := c.Param("userNumber")
 	room := c.Param("room")

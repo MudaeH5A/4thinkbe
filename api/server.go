@@ -55,11 +55,39 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 		return echo.NewHTTPError(500, err)
 	}
 	if err == mgo.ErrNotFound {
-		r := models.Room{Name: "Sala", Boxes: []models.Item{models.Item{Quantity: 2, Type: "moveis"}}}
+		r := models.Room{
+			Name: "Sala",
+			Boxes: []models.Box{
+				models.Box{
+					Items: []models.Item{
+						models.Item{
+							Quantity: 2,
+							Type:     "moveis",
+						},
+					},
+				},
+				models.Box{
+					Items: []models.Item{
+						models.Item{
+							Quantity: 1,
+							Type:     "tv",
+						},
+					},
+				},
+			},
+		}
 		ca := models.Address{Street: "Santa Luiza", Number: 259, Latitude: -22.9163398, Longitude: -43.2341546}
 		na := models.Address{Street: "Av Paulista", Number: 2537, Latitude: -23.5604276, Longitude: -46.6579269}
 		offer := models.Offer{Distance: 50}
-		p = models.Profile{ID: number, Inventory: r, NewAddress: na, CurrentAddress: ca, MovingData: time.Now(), MovingTime: time.Now(), Offer: offer}
+		p = models.Profile{
+			ID:             number,
+			Inventory:      r,
+			NewAddress:     na,
+			CurrentAddress: ca,
+			MovingData:     time.Now(),
+			MovingTime:     time.Now(),
+			Offer:          offer,
+		}
 		errC := models.Create(s.Storage, p)
 		if errC != nil {
 			return echo.NewHTTPError(500, errC)

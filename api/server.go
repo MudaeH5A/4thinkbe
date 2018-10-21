@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -195,7 +196,52 @@ func (s *Server) BoxContent(c echo.Context) (err error) {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
-	return c.JSON(http.StatusFound, p.Inventory[index].Boxes[boxInt-1])
+	data := p.Inventory[index].Boxes[boxInt-1]
+	tmp := `<style>h1,h3 {
+	color: #37474f;
+	text-shadow: rgba(0, 0, 0, .12) 0 0 1px;
+	margin: 10px 0;
+	line-height: 1.25em;
+}
+h1 {
+	color: #FF7E56;
+}
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: #fff;
+    color: #76838f;
+    overflow-x: hidden;
+    padding-top: 56px;
+}
+#toolbar {
+    width: 100%;
+    height: 56px;
+    position: fixed;
+    z-index: 99;
+    top: 0;
+    left: 0;
+    right: 0;
+    justify-content: center;
+    align-items: center;
+    box-shadow:  0 2px 2px 0 rgba(0, 0, 0, .08);
+}
+</style>
+<div id="toolbar">
+	<h1>Mudae</h1>
+</div>
+	<h3> Itens da caixa </h3>
+<ul>
+{{range .Items}}
+	<li>{{.Type}} {{.Quantity}}x</li>
+{{end}}
+</ul>`
+	newTemplate, err := template.New("items").Parse(tmp)
+	if err != nil {
+		return
+	}
+	resp := c.Response()
+	resp.Header().Set("Content-Type", "text/html")
+	return newTemplate.Execute(resp.Writer, data)
 }
 
 func findRoomAndIndex(name string, rooms []models.Room) (i int, err error) {

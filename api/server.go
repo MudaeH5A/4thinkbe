@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/arxdsilva/4thinkbe/db"
-	"github.com/arxdsilva/4thinkbe/models"
+	"github.com/MudaeH5A/4thinkbe/db"
+	"github.com/MudaeH5A/4thinkbe/models"
 	"github.com/labstack/echo"
 	qrcode "github.com/skip2/go-qrcode"
 	"gopkg.in/mgo.v2"

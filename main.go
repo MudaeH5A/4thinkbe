@@ -1,6 +1,6 @@
 package main
 
-import "github.com/arxdsilva/4thinkbe/api"
+import "github.com/MudaeH5A/4thinkbe/api"
 
 func main() {
 	server := api.New()

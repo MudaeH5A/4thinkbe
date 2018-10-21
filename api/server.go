@@ -1,8 +1,10 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -82,7 +84,7 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 		}
 		ca := models.Address{Street: "Santa Luiza", Number: 259, Latitude: -22.9163398, Longitude: -43.2341546}
 		na := models.Address{Street: "Av Paulista", Number: 2537, Latitude: -23.5604276, Longitude: -46.6579269}
-		offer := models.Offer{Distance: 50}
+		offer := models.Offer{}
 		p = models.Profile{
 			ID:             number,
 			Inventory:      []models.Room{r},
@@ -127,6 +129,11 @@ func (s *Server) VehicleHandler(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusNotFound, err)
 	}
 	p.Offer.VehicleType = vehicle
+	distance, err := calculateTotalDistance(p.CurrentAddress, p.NewAddress)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	p.Offer.Distance = distance
 	p.Offer.CalculateTotalValue()
 	err = p.CreateOrUpdate(s.Storage)
 	if err != nil {
@@ -198,4 +205,29 @@ func findRoomAndIndex(name string, rooms []models.Room) (i int, err error) {
 		}
 	}
 	return i, errors.New("Room not found")
+}
+
+func calculateTotalDistance(oldAddress, newAddress models.Address) (dist float64, err error) {
+	origins := fmt.Sprintf("origins=%v,%v", oldAddress.Latitude, oldAddress.Longitude)
+	destinations := fmt.Sprintf("destinations=%v,%v", newAddress.Latitude, newAddress.Longitude)
+	apiKey := fmt.Sprintf("key=%s", os.Getenv("MAPS_KEY"))
+	googleMapsEndpoint := fmt.Sprintf("https://maps.googleapis.com/maps/api/distancematrix/json?%s&%s&%s", origins, destinations, apiKey)
+	resp, err := http.Get(googleMapsEndpoint)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		return dist, errors.New(fmt.Sprintf("Google responded with wrong status code: %v", resp.StatusCode))
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	var mapsResp models.MapsResponse
+	if err = json.Unmarshal(body, &mapsResp); err != nil {
+		return
+	}
+	dist = float64(mapsResp.Rows[0].Elements[0].Distance.Value / 1000)
+	return
 }

@@ -49,6 +49,21 @@ func (p *Profile) DeleteByID(db *mgo.Database) error {
 	return db.C("profiles").RemoveId(p.ID)
 }
 
-func GetByID(db *mgo.Database, id string) (p Profile, err error) {
+func GetByID(db *mgo.Database, id int) (p Profile, err error) {
 	return p, db.C("profiles").FindId(id).One(&p)
+}
+
+func (o *Offer) CalculateTotalValue() {
+	switch o.VehicleType {
+	case 1:
+		o.TotalValue = 250 + 2.0*o.Distance
+	case 2:
+		o.TotalValue = 350 + 2.6*o.Distance
+	case 3:
+		o.TotalValue = 500 + 3.0*o.Distance
+	}
+}
+
+func Create(db *mgo.Database, p Profile) (err error) {
+	return db.C("profiles").Insert(&p)
 }

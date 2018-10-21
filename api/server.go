@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"os"
 	"strconv"
@@ -38,14 +39,16 @@ func port() (p string) {
 
 // HomeHandler populates a new user if it does not exists
 // or just returns it if It is existant in the DB
+// GET /:userNumber
 // HTTP responses:
 // 200 ok
+// 400 bad request
 // 500 internal server error
 func (s *Server) HomeHandler(c echo.Context) (err error) {
 	userNumber := c.Param("userNumber")
 	number, err := strconv.Atoi(userNumber)
 	if err != nil {
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
 	p, err := models.GetByID(s.Storage, number)
 	if (err != nil) && (err != mgo.ErrNotFound) {

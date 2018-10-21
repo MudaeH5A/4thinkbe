@@ -29,7 +29,7 @@ func (s *Server) Listen() {
 	e.Static("/static", "assets")
 	e.GET("/:userNumber", s.HomeHandler)
 	e.GET("/:userNumber/:room/:boxNumber/code", s.BoxCoder)
-	// e.GET("/:userNumber/:room/:boxNumber", s.BoxContent)
+	e.GET("/:userNumber/:room/:boxNumber", s.BoxContent)
 	e.POST("/:userNumber/:vehicle", s.VehicleHandler)
 	e.Logger.Fatal(e.Start(":" + port()))
 }
@@ -85,7 +85,7 @@ func (s *Server) HomeHandler(c echo.Context) (err error) {
 		offer := models.Offer{Distance: 50}
 		p = models.Profile{
 			ID:             number,
-			Inventory:      r,
+			Inventory:      []models.Room{r},
 			NewAddress:     na,
 			CurrentAddress: ca,
 			MovingData:     time.Now(),
@@ -158,4 +158,44 @@ func (s *Server) BoxCoder(c echo.Context) (err error) {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return
+}
+
+// BoxContent lists the contents of a specific
+// box after the QR code call to the API
+// GET /:userNumber/:room/:box
+//
+// HTTP responses:
+// 302 OK
+// 400 bad request
+// 404 not found
+func (s *Server) BoxContent(c echo.Context) (err error) {
+	userNumber := c.Param("userNumber")
+	room := c.Param("room")
+	boxNumber := c.Param("boxNumber")
+	number, err := strconv.Atoi(userNumber)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	p, err := models.GetByID(s.Storage, number)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, err)
+	}
+	index, err := findRoomAndIndex(room, p.Inventory)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	boxInt, err := strconv.Atoi(boxNumber)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	return c.JSON(http.StatusFound, p.Inventory[index].Boxes[boxInt])
+}
+
+func findRoomAndIndex(name string, rooms []models.Room) (i int, err error) {
+	for i, room := range rooms {
+		if room.Name == name {
+			return i, nil
+		}
+	}
+	return i, errors.New("Room not found")
 }
